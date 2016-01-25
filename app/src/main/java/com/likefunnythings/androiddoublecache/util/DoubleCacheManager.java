@@ -6,12 +6,15 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Environment;
+import android.util.Base64;
 import android.util.Log;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 
 /**
  * 网络图片双缓存的工具类(包括内存缓存和硬盘缓存)
@@ -62,6 +65,8 @@ public class DoubleCacheManager {
             //2.保存到硬盘缓存中
             if (null != getDiskLruCache() && null == getDiskLruCache().get(key)) {//不存在硬盘缓存中
                 // 保存到硬盘缓存中
+                //Tip:缓存到硬盘上面的key混淆文件（出现'/'导致FileNotFoundException）
+                key = hashKeyForDisk(key);
                 DiskLruCache.Editor editor = getDiskLruCache().edit(key);
                 OutputStream os = editor.newOutputStream(0);
                 bitmap.compress(Bitmap.CompressFormat.JPEG, 100, os);
@@ -154,7 +159,7 @@ public class DoubleCacheManager {
 
             //2.从硬盘缓存中获取Bitmap， 如果存在硬盘缓存中返回
             if (null != getDiskLruCache() && null != getDiskLruCache().get(key)) {
-
+                key = hashKeyForDisk(key);
                 DiskLruCache.Snapshot snapshot = getDiskLruCache().get(key);
                 InputStream is = snapshot.getInputStream(0);
                 Bitmap bitmap = BitmapFactory.decodeStream(is);
@@ -167,5 +172,46 @@ public class DoubleCacheManager {
         return null;
 
     }
+
+
+//============================================================================================
+//============================================================================================
+
+    /**
+     * 使key符合文件名的标准
+     *
+     * @param key
+     * @return
+     */
+    public String hashKeyForDisk(String key) {
+        String cacheKey;
+        try {
+            final MessageDigest mDigest = MessageDigest.getInstance("MD5");
+            mDigest.update(key.getBytes());
+            cacheKey = bytes2HexString(mDigest.digest());
+        } catch (NoSuchAlgorithmException e) {
+            cacheKey = String.valueOf(key.hashCode());
+        }
+        return cacheKey;
+    }
+
+    /**
+     * 将字节数组转十六进制（0-F）
+     * @param bytes
+     * @return
+     */
+    private String bytes2HexString(byte[] bytes) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < bytes.length; i++) {
+            String hex = Integer.toHexString(0xFF & bytes[i]);
+            if (hex.length() == 1) {
+                sb.append('0');
+            }
+            sb.append(hex);
+        }
+        return sb.toString();
+    }
+//============================================================================================
+//============================================================================================
 
 }

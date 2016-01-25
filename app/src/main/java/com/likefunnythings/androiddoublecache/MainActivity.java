@@ -7,6 +7,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 
 import com.likefunnythings.androiddoublecache.util.DoubleCacheManager;
@@ -20,6 +22,7 @@ import java.net.URLConnection;
 public class MainActivity extends ActionBarActivity {
 
     private ImageView imageView;
+    private Button btn_test;
 
     private String urlPath = "http://kanmeizi.likefunnythings.com/wp-content/themes/iphoto/images/logo.png";
 
@@ -49,7 +52,19 @@ public class MainActivity extends ActionBarActivity {
 
     private void init() {
         imageView = (ImageView) this.findViewById(R.id.imageView);
+        btn_test = (Button) this.findViewById(R.id.btn_test);
 
+        getImageFromNet();
+
+        btn_test.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                getImageFromNet();
+            }
+        });
+    }
+
+    private void getImageFromNet(){
         new AsyncTask<String, Integer, Bitmap>() {
 
             @Override
