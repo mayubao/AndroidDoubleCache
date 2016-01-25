@@ -2,7 +2,7 @@
 
 ##如何使用
 
-1.直接应用util包
+1.直接引用util包的类
 
 * DiskLruCache.java ,MemoryLruCache.java, DoubleCacheManager.java三个类（需要引入android.support.v4包）
 * DiskLruCache.java 是开源的一个硬盘缓存类，很多知名的Android app有用到来作为硬盘缓存的方案。 
