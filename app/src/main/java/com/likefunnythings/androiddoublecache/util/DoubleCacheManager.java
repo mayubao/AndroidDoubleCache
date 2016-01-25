@@ -120,6 +120,7 @@ public class DoubleCacheManager {
         } else {
             cachePath = context.getCacheDir().getPath();
         }
+        Log.i("cachePath", "--->>>" + cachePath);
         return new File(cachePath + File.separator + uniqueName);
     }
 
@@ -176,7 +177,7 @@ public class DoubleCacheManager {
 
 //============================================================================================
 //============================================================================================
-
+//处理key为url地址缓存到硬盘上符合文件名的标准
     /**
      * 使key符合文件名的标准
      *
